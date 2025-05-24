@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="robots" content="index,follow">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta http-equiv="Content-Style-Type" content="text/css">
+    <meta http-equiv="Content-Script-Type" content="text/javascript">
+    <meta http-equiv="pragma" content="no-cache">
+    <meta http-equiv="cache-Control" content="no-cache">
+    <meta http-equiv="expires" content="0">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <title>にゃんこキャラ改造</title>
+</head>
+<body>
+    <div class="app-frame">
+        <div class="app-border">
+            <div class="corner top-left"></div>
+            <div class="corner top-right"></div>
+            <div class="corner bottom-left"></div>
+            <div class="corner bottom-right"></div>
+            <div class="edge top"></div>
+            <div class="edge right"></div>
+            <div class="edge bottom"></div>
+            <div class="edge left"></div>
+            
+            <div class="ios-container">
+                <div class="status-bar">
+                    <div class="time" id="current-time">11:23</div>
+                    <div class="status-icons">
+                        <svg class="signal-icon" viewBox="0 0 18 12" width="18" height="12">
+                            <path fill="currentColor" d="M0 12h3V2H0v10zm5 0h3V5H5v7zm5 0h3V7h-3v5zm5 0h3v-3h-3v3z"/>
+                        </svg>
+                        <svg class="wifi-icon" viewBox="0 0 16 12" width="16" height="12">
+                            <path fill="currentColor" d="M8 9.75a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5zM3.5 6.75a6.5 6.5 0 0 1 9 0l-1.5 1.5a4.5 4.5 0 0 0-6 0l-1.5-1.5zm-3-3a10.5 10.5 0 0 1 15 0l-1.5 1.5a8.5 8.5 0 0 0-12 0L.5 3.75z"/>
+                        </svg>
+                        <svg class="battery-icon" viewBox="0 0 25 12" width="25" height="12">
+                            <rect x="0.5" y="0.5" width="21" height="11" rx="2.5" fill="none" stroke="currentColor"/>
+                            <rect x="2" y="2" width="18" height="8" rx="1.5" fill="currentColor"/>
+                            <path fill="currentColor" d="M23 4v4a1 1 0 0 0 2 0V4a1 1 0 1 0-2 0z"/>
+                        </svg>
+                    </div>
+                </div>
+
+                <div class="app-container">
+                    <div class="scrollable-container" id="main-scroll-container">
+                        <div id="contents">
+                            <div class="header-container">
+                                <h2 class="app-title">改竄キャラ選択<span class="subtitle">create by RHgrive</span></h2>
+                                <button class="ios-button danger-button" onclick="remove()">
+                                    <svg viewBox="0 0 24 24" width="16" height="16">
+                                        <path fill="currentColor" d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/>
+                                    </svg>
+                                    データ削除
+                                </button>
+                            </div>
+                            
+                            <div class="switch-container">
+                                <input type="checkbox" class="switch-input" onchange="aa()" id="aa">
+                                <label for="aa" class="switch-label"></label>
+                                <span class="switch-text">再生産</span>
+                            </div>
+                            
+                            <div class="card-container">
+                                <div class="search-bar">
+                                    <custom-select class="search_rank" onchange="changeDisplay();">
+                                        <option value="">全ランク</option>
+                                        <option value="[基本]">基本</option>
+                                        <option value="[EX]">EX</option>
+                                        <option value="[レア]">レア</option>
+                                        <option value="[激レア]">激レア</option>
+                                        <option value="[超激レア]">超激レア</option>
+                                        <option value="[伝説レア]">伝説レア</option>
+                                    </custom-select>
+                                    <div class="search-input-container">
+                                        <svg class="search-icon" viewBox="0 0 24 24" width="16" height="16">
+                                            <path fill="currentColor" d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+                                        </svg>
+                                        <input class="search_text ios-input" placeholder="Search Words" type="text">
+                                    </div>
+                                </div>
+                                
+                                <table id="List" class="character-list">
+                                    <thead>
+                                        <tr>
+                                            <th>No.</th>
+                                            <th>ランク</th>
+                                            <th>キャラクター名</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="table-body"></tbody>
+                                    <tr class="noresults"><td colspan="4">検索対象データ無し</td></tr>
+                                </table>
+                            </div>
+                        </div>
+                        
+                        <div id="status" class="status-panel">
+                            <div class="panel-glass-effect"></div>
+                            <h3 class="panel-title">形態を選択してください</h3>
+                            <div class="form-buttons">
+                                <button onclick="chooseStatus(1)" class="ios-button primary-button">第1形態</button>
+                                <button onclick="chooseStatus(2)" class="ios-button primary-button">第2形態</button>
+                                <button onclick="chooseStatus(3)" class="ios-button primary-button">第3形態</button>
+                                <button id="kaihou" class="ios-button accent-button">解放</button>
+                            </div>
+                        </div>
+                        
+                        <div id="choose" class="choose-panel">
+                            <div class="panel-glass-effect"></div>
+                            <div class="panel-header">
+                                <h3 class="panel-title">変えるステータスを選んでください</h3>
+                                <div class="panel-actions">
+                                    <button class="ios-button secondary-button back-button" onclick="back()">
+                                        <svg viewBox="0 0 24 24" width="16" height="16">
+                                            <path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                                        </svg>
+                                        キャラ選択に戻る
+                                    </button>
+                                    <p class="help-link" onclick="torisetsu()">取説</p>
+                                </div>
+                            </div>
+                            
+                            <div class="status-list"></div>
+                        </div>
+                        
+                        <div id="torisetsu" class="manual-panel">
+                            <div class="panel-glass-effect"></div>
+                            <div class="panel-header">
+                                <button class="ios-button secondary-button" onclick="backed()">
+                                    <svg viewBox="0 0 24 24" width="16" height="16">
+                                        <path fill="currentColor" d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+                                    </svg>
+                                    戻る
+                                </button>
+                            </div>
+                            <div class="manual-content">
+                                <p>
+                                    χは設定したい数<br>
+                                    効果・能力は0→off 1→on<br>
+                                    確率は百分率で<br>
+                                    時間はf単位で(全お宝無しの時のステータス)<br>
+                                    <br>
+                                    ※攻撃射程<br>
+                                    遠方<br>
+                                    38 最短射程　4χ<br>
+                                    39 最長射程　4χ-(38の値)<br>
+                                    <br>
+                                    例:最短200・最長1500の場合<br>
+                                    38 800<br>
+                                    39 5200<br>
+                                    <br>
+                                    全方位<br>
+                                    38 最長射程　4χ<br>
+                                    39 最短射程　4χ-(38の値)<br>
+                                    <br>
+                                    例:最短-500・最長500の場合<br>
+                                    38 2000<br>
+                                    39 -4000<br>
+                                    <br>
+                                    ※攻撃回数<br>
+                                    通常<br>
+                                    49 -1<br>
+                                    50 0<br>
+                                    51 -1<br>
+                                    52 0<br>
+                                    <br>
+                                    一回攻撃後消滅<br>
+                                    49 1<br>
+                                    50 0<br>
+                                    51 -1<br>
+                                    52 2<br>
+                                    <br>
+                                    応用<br>
+                                    数値を弄れば、χ回攻撃後消滅・χ回攻撃後攻撃をしなくなる等出来るようになる(説明が難しいのでやりたければ個人で)<br>
+                                    <br>
+                                    ※多段ヒット攻撃<br>
+                                    例:攻撃力3060・一撃目威力30・二撃目威力30・三撃目威力3000の場合<br>
+                                    -3 30<br>
+                                    53 30<br>
+                                    54 3000<br>
+                                    <br>
+                                    各攻撃力は必ず1以上(0以下の場合挙動がおかしくなる可能性あり)<br>
+                                    <br>
+                                    ※多段ヒット発生<br>
+                                    例:一撃目発生90f・二撃目発生150f・三撃目発生300fの場合<br>
+                                    7 90<br>
+                                    55 150<br>
+                                    56 300<br>
+                                    7の値＜55の値＜56の値になるようにする<br>
+                                    <br>
+                                    ※生産時<br>
+                                    -1が基本<br>
+                                    0の時だけ、モンスターハンターコラボ系と同じ生産演出になる<br>
+                                    <br>
+                                    ※魂<br>
+                                    死亡時に出る奴<br>
+                                    -1 なし<br>
+                                    0 基本<br>
+                                    1 モネコ<br>
+                                    2 ぐでたま1<br>
+                                    3 ぐでたま2<br>
+                                    4 ぐでたま3<br>
+                                    5 ぐでたま4<br>
+                                    6 ぐでたま5<br>
+                                    7 狂乱のモネコ<br>
+                                    8 エヴァコラボ1<br>
+                                    9 ぐでたま6<br>
+                                    10 伝説レア1<br>
+                                    11 伝説レア2<br>
+                                    12 初音ミク1<br>
+                                    13 初音ミク2<br>
+                                    14 エヴァ2<br>
+                                    15 エヴァ3<br>
+                                    <br>
+                                    ※ワープ先<br>
+                                    67の値から68の値の間にランダムでワープさせる(ただし、67の値＜68の値の時のみ)<br>
+                                    値が+で敵側、-で味方側にワープさせる<br>
+                                    例:敵側へ500ワープ<br>
+                                    67 2000<br>
+                                    68 2000以下ならなんでも可<br>
+                                    <br>
+                                    味方側へ200ワープ<br>
+                                    67 -800<br>
+                                    68 -800以下ならなんでも可<br>
+                                    <br>
+                                    敵側へ100から500の間にランダムでワープ<br>
+                                    67 400<br>
+                                    68 2000<br>
+                                    <br>
+                                    ※烈波発生位置<br>
+                                    81 烈波最短発生位置　4χ<br>
+                                    82 烈波最長発生位置　4χ-(81の値)<br>
+                                    <br>
+                                    例:最短350・最長600の場合<br>
+                                    81 1400<br>
+                                    82 1000<br>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="home-indicator"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
